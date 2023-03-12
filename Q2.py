@@ -3,20 +3,49 @@ import heapq as hq
 import cv2
 import numpy as np
 
+class node_object:
+    def __init__(self,pt,cost,parent_node) :
+        self.pt=pt
+        self.cost=cost 
+        self.parent_node=parent_node
+        # self.node_id=node_id
+    def __lt__(self,other):
+        return self.cost < other.cost
+    
+
+def get_input():
+    start_coor=tuple(int(item) for item in input("\n Start Node:").split(','))
+    if not check_valid_points(start_coor):
+        print("Wrong Start Node ,Please run proram again and enter proper value")
+        exit()
+    end_coor= tuple(int(item) for item in input("\n End Node:").split(','))
+    if not check_valid_points(end_coor):
+        print("Wrong End Node ,Please run proram again and enter proper value")
+        exit()
+    if end_coor == start_coor:
+        print ("Start and End are the Same Exiting.PLease run program again")
+        exit()
+    return start_coor,end_coor
+
+
 
 def check_if_in_obstacle(point):
     x,y=point
     obstruction_flag=False
 
     # print(point)
-    if (((39*x)+70*(y)-14860)>=0) and (((39*x)-70*(y)-8550)<=0) and (((39*x)+70*(y)-26050)<=0) and (((39*x)-70*(y)+2650)>=0) and  (230<x<370):
+    if (((39*x)+70*(y)-14860)>0) and (((39*x)-70*(y)-8550)<0) and (((39*x)+70*(y)-26050)<0) and (((39*x)-70*(y)+2650)>0) and  (230<x<370):
         obstruction_flag=True
         # print("in Hexagon")
 
-    if (((23*x)+(12*y)-13345)<=0) and (((23*x)-(12*y)-10345)<=0) and x>=455:
+    # if (((23*x)+(12*y)-13345)<0) and (((23*x)-(12*y)-10345)<0) and x>455:
+    #     obstruction_flag=True
+        # print("In triangle")
+    if (((121*x)+(61*y)-70061)<0) and (((121*x)-(61*y)-54815)<0) and x>455:
         obstruction_flag=True
         # print("In triangle")
-    if (x>=95) and (x<=155) and ((y<=105) or (y>=145)):
+
+    if (x>95) and (x<155) and ((y<105) or (y>145)):
         obstruction_flag=True
         # print("in one or two of the rectangles")
 
@@ -28,14 +57,13 @@ def check_if_in_obstacle(point):
         # print("Point in Obstruction")
         return True
 
-
 def check_valid_points(point):
     x,y=point
     if x<5 or x>595 or y<5 or y>245:
         # print("invalid Point")
         valid_point=False
         return valid_point
-    # if x<0 or x>600 or y<0 or y>250:
+    # if x<0 or x>595 or y<0 or y>245:
     #     # print("invalid Point")
     #     valid_point=False
     #     return valid_point
@@ -49,10 +77,11 @@ def check_valid_points(point):
     else:
         valid_point = True
         return valid_point
+        
 
 
 def actionset(point,cost):
-    
+    #node is in the form of cost,index,parent_index,point
     px,py=point
     cost=cost
     
@@ -68,25 +97,6 @@ def actionset(point,cost):
             list_of_actions.append(((x,y),cost1))
 
     return list_of_actions
-        
-def draw_points(canvas):
-    color_path=(255,0,0)
-    counter=0
-    for x in range(5,596):
-        for y in range(5,246):
-            if check_valid_points((x,y)):
-                canvas[y,x]= color_path
-                counter += 1
-                # print(y,x)
-                if counter == 100:
-                    counter = 0
-                    cv2.imshow('Explored Nodes', canvas)
-                    cv2.waitKey(1)
-
-    cv2.imshow('All Explored Nodes', canvas)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 
 
 
@@ -124,6 +134,23 @@ def draw_map():
     # cv2.destroyAllWindows()
     return canvas
 
+def draw_points(canvas):
+    color_path=(255,0,0)
+    counter=0
+    for x in range(5,596):
+        for y in range(5,246):
+            if check_valid_points((x,y)):
+                canvas[y,x]= color_path
+                counter += 1
+                # print(y,x)
+                if counter == 100:
+                    counter = 0
+                    cv2.imshow('Explored Nodes', canvas)
+                    cv2.waitKey(1)
+
+    cv2.imshow('All Explored Nodes', canvas)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
 canvas=draw_map()
