@@ -99,6 +99,61 @@ def actionset(point,cost):
     return list_of_actions
 
 
+def node_id(node):
+    x,y=node.pt
+    key = 1022*x + 111*y 
+    return key
+
+def dijkstra(start_point,end_point):
+
+    start=start_point
+    end=end_point
+
+    start_id=node_id(start)
+    ntv={}
+    ntv[(start_id)]= start  
+
+    visited_nodes={}
+    log=[]
+    hq.heappush(log,[start.cost,start])
+    list_of_all_nodes=[]
+
+    while (len(log) !=0):
+        current_node= hq.heappop(log)[1]
+        list_of_all_nodes.append([current_node])
+        current_node_id=node_id(current_node)
+        if current_node.pt == end.pt:
+            end.parent_node = current_node.parent_node
+            end.cost=current_node.cost
+            print("Goal Point Reached") # change 
+            end_of_search=True
+            return list_of_all_nodes,end_of_search
+        if current_node_id in visited_nodes:
+            continue
+        else:
+            visited_nodes[current_node_id]= current_node
+        del ntv[current_node_id]
+
+        action=actionset(current_node.pt,current_node.cost)
+        for idx in action:
+            new_node=node_object(idx[0],idx[1],current_node) #NEEDS TO BE DEFINED 
+            new_node_id=node_id(new_node)
+
+            if not check_valid_points(new_node.pt):
+                continue 
+            elif new_node_id in visited_nodes:
+                continue
+            if new_node_id in ntv:
+                if  ntv[new_node_id].cost>new_node.cost:
+                    ntv[new_node_id].cost = new_node.cost
+                    ntv[new_node_id].parent_node = new_node.parent_node
+            else:
+                ntv[new_node_id]=new_node
+
+            hq.heappush(log,[new_node.cost,new_node])
+        end_of_search=False
+
+    return list_of_all_nodes,end_of_search
 
 def draw_map():
     #red is bloated green is without bloating 
