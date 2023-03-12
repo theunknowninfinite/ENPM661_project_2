@@ -14,18 +14,17 @@ class node_object:
     
 
 def get_input():
-    start_coor=tuple(int(item) for item in input("\n Start Node:").split(','))
+    start_coor=tuple(int(item) for item in input("\n Start Node seperated by comma:").split(','))
     if not check_valid_points(start_coor):
         print("Wrong Start Node ,Please run proram again and enter proper value")
         exit()
-    end_coor= tuple(int(item) for item in input("\n End Node:").split(','))
+    end_coor= tuple(int(item) for item in input("\n End Node seperated by comma:").split(','))
     if not check_valid_points(end_coor):
         print("Wrong End Node ,Please run proram again and enter proper value")
         exit()
     if end_coor == start_coor:
         print ("Start and End are the Same Exiting.PLease run program again")
         exit()
-    return start_coor,end_coor
 
 
 
@@ -155,21 +154,37 @@ def dijkstra(start_point,end_point):
 
     return list_of_all_nodes,end_of_search
 
-def draw_map():
-    #red is bloated green is without bloating 
+def backtrack_path(end_point):
+    list_of_points=[]
+    list_of_points.append(end_point.pt)
 
+    parent=end_point.parent_node
+    test=parent.pt
+    while parent != None:
+        list_of_points.append(parent.pt)
+        parent=parent.parent_node
+    
+    list_of_points.reverse()
+    return list_of_points
+
+
+
+def draw_map():
+
+    green=(0,225,0)
+    blue=(255,0,0)
+    red=(0,0,255)
+    #red is bloated green is without bloating 
     canvas=np.zeros((250,600,3))
     triangle=np.array([[460,225],[460,25],[510,125]])
-    # triangleb= np.array([[455,228],[455,22],[515,125]])
-    triangleb=np.array([[455,240],[455,10],[515,125]])
+    # triangleb=np.array([[455,240],[455,10],[515,125]])
+    triangleb=np.array([[455,246],[455,3],[516,125]])
     hexagon=np.array([[235.05,162.5],[235.05,87.5],[300,50],[364.95,87.5],[364.95,162.5],[300,200]])
     hexagonb=np.array([[230.05,165.5],[230.05,84.5],[300,45],[369.95,84.5],[369.95,165.5],[300,205]])
     hexagon=np.round(hexagon,0).astype(np.int32)
     hexagonb=np.round(hexagonb,0).astype(np.int32)
 
-    green=(0,225,0)
-    blue=(255,0,0)
-    red=(0,0,255)
+    
     smaller_track=np.array([[5,5],[594,244],[0,245],[595,0]])
     cv2.rectangle(canvas,[5,5],[595,245],(255,255,255),thickness=-1)
     cv2.fillPoly(canvas,[hexagonb],red)
@@ -184,30 +199,63 @@ def draw_map():
     cv2.rectangle(canvas,[100,245],[150,150],green,thickness=-1)
 
     # canvas=cv2.flip(canvas,0)
-    # cv2.imshow('Djikstra's Map', canvas)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow('Map', canvas)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     return canvas
+ 
 
-def draw_points(canvas):
+def draw_points(canvas,backtrack_nodes,all_nodes):
     color_path=(255,0,0)
     counter=0
-    for x in range(5,596):
-        for y in range(5,246):
-            if check_valid_points((x,y)):
-                canvas[y,x]= color_path
+    color_nodes=(20,220,0)
+    print(canvas.shape)
+    height= canvas.shape[0]
+    for i in all_nodes:
+                x,y=i[0].pt
+                canvas[height-y,x]= color_nodes
+                counter += 1
+                if counter == 100:
+                    counter = 0
+                    # canvas=cv2.flip(canvas,0)
+                    cv2.imshow('Path', canvas)
+                    cv2.waitKey(1)
+    for i in backtrack_nodes:
+                canvas[height-i[1],i[0]]= color_path
                 counter += 1
                 # print(y,x)
                 if counter == 100:
                     counter = 0
-                    cv2.imshow('Explored Nodes', canvas)
+                    # canvas=cv2.flip(canvas,0)
+                    cv2.imshow('Path', canvas)
                     cv2.waitKey(1)
-
-    cv2.imshow('All Explored Nodes', canvas)
+    cv2.imshow('Path', canvas)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
 
-canvas=draw_map()
-draw_points(canvas)
 
+
+if __name__== '__main__':
+
+    start,end=get_input()
+    # start=(5,5)
+    # end=(515,145)
+    
+
+    st_time=time.time()
+    start_node=node_object(start,0,None)
+    end_node=node_object(end,0,None)
+    all_points_generated,goal_reached=dijkstra(start_node,end_node)
+   
+    
+    if goal_reached:
+        backtrack_points=backtrack_path(end_node)
+        print(backtrack_points,len(backtrack_points))
+        img=draw_map()
+        draw_points(img,backtrack_points,all_points_generated)
+    else:
+        print("No path found")
+    
+    end_time=time.time()-st_time
+    print("Total time for execution was ",end_time)
