@@ -16,7 +16,7 @@ for a Point Robot
 ```` 
 $ git clone link-of-repo
 ````
-2. Then run the command ```` $ pythin nameoffile,py ```` to run the script
+2. Then run the command ```` $ python nameoffile,py ```` to run the script
 
 
 

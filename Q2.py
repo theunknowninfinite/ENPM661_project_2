@@ -1,8 +1,11 @@
+#GiTHUB LINK-https://github.com/theunknowninfinite/ENPM661_project_2
+
 import time 
 import heapq as hq
 import cv2
 import numpy as np
 
+#defining Node Object 
 class node_object:
     def __init__(self,pt,cost,parent_node) :
         self.pt=pt
@@ -12,7 +15,7 @@ class node_object:
     def __lt__(self,other):
         return self.cost < other.cost
     
-
+# getting input from  user
 def get_input():
     start_coor=tuple(int(item) for item in input("\n Start Node seperated by comma:").split(','))
     if not check_valid_points(start_coor):
@@ -25,9 +28,10 @@ def get_input():
     if end_coor == start_coor:
         print ("Start and End are the Same Exiting.PLease run program again")
         exit()
+    return start_coor,end_coor
 
 
-
+#checking if point is clear of any obstructions 
 def check_if_in_obstacle(point):
     x,y=point
     obstruction_flag=False
@@ -55,7 +59,7 @@ def check_if_in_obstacle(point):
     elif obstruction_flag:
         # print("Point in Obstruction")
         return True
-
+#checking if point is valid 
 def check_valid_points(point):
     x,y=point
     if x<5 or x>595 or y<5 or y>245:
@@ -78,9 +82,9 @@ def check_valid_points(point):
         return valid_point
         
 
-
+#all possible actions with cost 
 def actionset(point,cost):
-    #node is in the form of cost,index,parent_index,point
+   
     px,py=point
     cost=cost
     
@@ -97,26 +101,28 @@ def actionset(point,cost):
 
     return list_of_actions
 
-
+#node id for easy to track  and random dict keys 
 def node_id(node):
     x,y=node.pt
     key = 1022*x + 111*y 
     return key
 
+# start of the algorithim
 def dijkstra(start_point,end_point):
 
     start=start_point
     end=end_point
-
+    #defining lists 
     start_id=node_id(start)
-    ntv={}
+    ntv={} #nodes to visit 
     ntv[(start_id)]= start  
 
-    visited_nodes={}
+    visited_nodes={}#nodes explored 
     log=[]
     hq.heappush(log,[start.cost,start])
-    list_of_all_nodes=[]
+    list_of_all_nodes=[] #all nodes generated 
 
+    #starting of algorithim
     while (len(log) !=0):
         current_node= hq.heappop(log)[1]
         list_of_all_nodes.append([current_node])
@@ -151,9 +157,10 @@ def dijkstra(start_point,end_point):
 
             hq.heappush(log,[new_node.cost,new_node])
         end_of_search=False
-
+    #the end 
     return list_of_all_nodes,end_of_search
 
+#for backtracking path 
 def backtrack_path(end_point):
     list_of_points=[]
     list_of_points.append(end_point.pt)
@@ -168,7 +175,7 @@ def backtrack_path(end_point):
     return list_of_points
 
 
-
+#drawing map only 
 def draw_map():
 
     green=(0,225,0)
@@ -204,7 +211,7 @@ def draw_map():
     cv2.destroyAllWindows()
     return canvas
  
-
+#draw all explored nodes and backtraacked path 
 def draw_points(canvas,backtrack_nodes,all_nodes):
     color_path=(255,0,0)
     counter=0
@@ -235,20 +242,20 @@ def draw_points(canvas,backtrack_nodes,all_nodes):
 
 
 
-
+#main function
 if __name__== '__main__':
-
+    #getting input from user 
     start,end=get_input()
     # start=(5,5)
     # end=(515,145)
     
-
+    #start of timer 
     st_time=time.time()
     start_node=node_object(start,0,None)
     end_node=node_object(end,0,None)
     all_points_generated,goal_reached=dijkstra(start_node,end_node)
    
-    
+    #goal found hooray 
     if goal_reached:
         backtrack_points=backtrack_path(end_node)
         print(backtrack_points,len(backtrack_points))
@@ -256,6 +263,7 @@ if __name__== '__main__':
         draw_points(img,backtrack_points,all_points_generated)
     else:
         print("No path found")
-    
+    #end timer 
     end_time=time.time()-st_time
+    #printing time taken for loop and plotting 
     print("Total time for execution was ",end_time)
