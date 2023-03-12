@@ -18,9 +18,6 @@ $ git clone link-of-repo
 ````
 2. Then run the command ```` $ pythin nameoffile,py ```` to run the script
 
-````
-source devel/setup.bash
-````
 
 
 ## Support
