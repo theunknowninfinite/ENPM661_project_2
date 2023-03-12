@@ -213,7 +213,7 @@ def draw_map():
  
 #draw all explored nodes and backtraacked path 
 def draw_points(canvas,backtrack_nodes,all_nodes):
-    color_path=(255,0,0)
+    color_path=(0,0,0)
     counter=0
     color_nodes=(20,220,0)
     print(canvas.shape)
